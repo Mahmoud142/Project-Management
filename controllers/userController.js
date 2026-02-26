@@ -78,7 +78,6 @@ export const updateUserById = asyncHandler(async (req, res, next) => {
 // @access    Private (any logged in user can update only his profile image)
 export const updateProfileImage = asyncHandler(async (req, res, next) => {
     
-    console.log(req.file);
     if (!req.file) {
         return next(new ApiError("Please upload an image", 400));
     }

@@ -5,7 +5,12 @@ import morgan from "morgan";
 import dbConnection from "./config/database.js";
 import ApiError from "./utils/apiError.js";
 import globalError from "./middlewares/errorMiddleware.js";  
+import path from "path";
+import { fileURLToPath } from "url";
 
+// Resolve __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -13,7 +18,7 @@ if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
     console.log(`Mode : ${process.env.NODE_ENV}`);
 }
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -45,7 +45,7 @@ export const createUser = asyncHandler(async (req, res, next) => {
 
 // @desc      Update user data without(password)
 // @route     PATCH /api/v1/users/:id
-// @access    Private/Admin
+// @access    Private 
 export const updateUserById = asyncHandler(async (req, res, next) => {
     const document = await User.findByIdAndUpdate(
         req.params.id,
@@ -71,6 +71,30 @@ export const updateUserById = asyncHandler(async (req, res, next) => {
 
     // document.save();
     res.status(200).json({ data: document });
+});
+
+// @desc      Update user profile image
+// @route     PATCH /api/v1/users/profileImage
+// @access    Private (any logged in user can update only his profile image)
+export const updateProfileImage = asyncHandler(async (req, res, next) => {
+    
+    console.log(req.file);
+    if (!req.file) {
+        return next(new ApiError("Please upload an image", 400));
+    }
+
+
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { profileImage: req.file.filename },
+        { new: true },
+    );
+
+    res.status(200).json({
+        status: "success",
+        message: "Image uploaded successfully",
+        data: user,
+    });
 });
 
 // @desc      Update user data without(password)

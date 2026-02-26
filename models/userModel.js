@@ -16,10 +16,12 @@ const userSchema = new mongoose.Schema(
             unique: true,
         },
         phone: String,
+        profileImage: String,
         password: {
             type: String,
             required: [true, "Please set your password"],
             minlength: [6, "password min length 6"],
+            select: false,
         },
         passwordChangedAt: Date,
         passwordResetCode: String,
@@ -34,6 +36,20 @@ const userSchema = new mongoose.Schema(
     { timestamps: true },
 );
 
+userSchema.set("toJSON", {
+    transform: (doc, ret) => {
+        delete ret.password;
+        return ret;
+    },
+});
+
+userSchema.set("toObject", {
+    transform: (doc, ret) => {
+        delete ret.password;
+        return ret;
+    },
+});
+
 // Document Middleware that automatically run before save user document
 userSchema.pre("save", async function (next) {
     // Only run this function if password was actually modified
@@ -42,6 +58,25 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 12);
 });
 
+// Function to generate the full URL for the image
+const setImageUrl = (doc) => {
+    if (doc.profileImage) {
+        // You must define BASE_URL in your .env file
+        // Example in dev: BASE_URL=http://localhost:5000
+        const imageUrl = `${process.env.BASE_URL}/uploads/${doc.profileImage}`;
+        doc.profileImage = imageUrl;    
+    }
+};
+
+// Hook triggered after any find query (find, findOne, findById)
+userSchema.post('init', (doc) => {
+    setImageUrl(doc);
+});
+
+// Hook triggered after a document is created
+userSchema.post('save', (doc) => {
+    setImageUrl(doc);
+});
 const User = mongoose.model("User", userSchema);
 
 export default User;

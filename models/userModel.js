@@ -60,11 +60,10 @@ userSchema.pre("save", async function (next) {
 
 // Function to generate the full URL for the image
 const setImageUrl = (doc) => {
-    if (doc.profileImage) {
-        // You must define BASE_URL in your .env file
-        // Example in dev: BASE_URL=http://localhost:5000
+
+    if (doc.profileImage && !doc.profileImage.startsWith("http")) {
         const imageUrl = `${process.env.BASE_URL}/uploads/${doc.profileImage}`;
-        doc.profileImage = imageUrl;    
+        doc.profileImage = imageUrl;
     }
 };
 

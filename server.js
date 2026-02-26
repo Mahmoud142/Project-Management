@@ -8,6 +8,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
+import cors from "cors";
 
 // DB & Error Handling Imports
 import dbConnection from "./config/database.js";
@@ -33,7 +34,8 @@ const PORT = process.env.PORT || 3000;
 
 // Set security HTTP headers
 app.use(helmet());
-
+app.use(cors());
+app.options(/.*/, cors());
 // Limit requests from same API
 const limiter = rateLimit({
     max: 100, // Limit each IP to 100 requests per `window`

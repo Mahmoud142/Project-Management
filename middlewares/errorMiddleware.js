@@ -28,6 +28,16 @@ const handleJWTError = () =>
 const handleExpiredJWT = () =>
     new AppError("Expired Token. please login again", 401);
 
+const handleCastErrorDB = (err) => {
+    const message = `Invalid ${err.path}: ${err.value}.`;
+    return new ApiError(message, 400); // 400 Bad Request
+};
+const handleValidationErrorDB = (err) => {
+
+    const errors = Object.values(err.errors).map((el) => el.message);
+    const message = `Invalid input data. ${errors.join(". ")}`;
+    return new ApiError(message, 400);
+};
 /* Define a global error handling middleware by specifying 4 parameters express know automatically that
     this is error handling middleware   */
 const globalError = (err, req, res, next) => {
@@ -40,6 +50,8 @@ const globalError = (err, req, res, next) => {
         if (err.code === 11000) err = handleDuplicateFieldsDB(err);
         if (err.name === "JsonWebTokenError") err = handleJWTError();
         if (err.name === "TokenExpiredError") err = handleExpiredJWT();
+        if (err.name === "CastError") err = handleCastErrorDB(err);
+        if (err.name === "ValidationError") err = handleValidationErrorDB(err);
         sendErrorForProduction(err, req, res);
     }
 };

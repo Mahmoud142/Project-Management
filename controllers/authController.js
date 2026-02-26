@@ -30,7 +30,7 @@ export const signup = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res, next) => {
     // 1) Check of email and password exist in the body (validation layer)
     // 2) Check if user exist && password correct
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email }).select("+password");
 
     let isCorrectPassword = false;
     if (user) {

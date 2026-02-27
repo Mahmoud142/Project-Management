@@ -1,34 +1,37 @@
-import { Queue, Worker } from "bullmq";
+import dotenv from "dotenv";
+dotenv.config({ path: "config.env" });
 
-// 1. Define the queue (connecting it to Redis running on Docker)
-const emailQueue = new Queue("emailQueue", {
-    connection: {
-        host: "127.0.0.1",
-        port: 6379,
-    },
+import { Queue, Worker } from "bullmq";
+import IORedis from "ioredis";
+
+const redisConnection = new IORedis(process.env.REDIS_URL, {
+    maxRetriesPerRequest: null,
+    tls: { rejectUnauthorized: false },
 });
 
-// 2. The Worker that pulls jobs from the queue and executes them in the background
+redisConnection.on("error", (err) => {
+    console.error("BullMQ Redis Connection Error:", err);
+});
+
+const emailQueue = new Queue("emailQueue", {
+    connection: redisConnection,
+});
+
 const emailWorker = new Worker(
     "emailQueue",
     async (job) => {
-        // The code here doesn't block the main server at all
         console.log(
-            `\n[Worker] ⏳ Starting work... Sending email to manager about task: "${job.data.taskTitle}"`,
+            `\n[Worker] Starting work... Sending email to manager about task: "${job.data.taskTitle}"`,
         );
 
-        // Simulate sending an actual email that takes 3 seconds
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
         console.log(
-            `[Worker] ✅ Email sent successfully to manager ID: ${job.data.managerId}\n`,
+            `[Worker] Email sent successfully to manager ID: ${job.data.managerId}\n`,
         );
     },
     {
-        connection: {
-            host: "127.0.0.1",
-            port: 6379,
-        },
+        connection: redisConnection,
     },
 );
 

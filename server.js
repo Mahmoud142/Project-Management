@@ -14,6 +14,7 @@ import cors from "cors";
 import dbConnection from "./config/database.js";
 import ApiError from "./utils/apiError.js";
 import globalError from "./middlewares/errorMiddleware.js";
+import {connectRedis} from "./config/redisClient.js";
 
 // Routes Imports (Must be at the top)
 import authRoute from "./routes/authRoute.js";
@@ -111,7 +112,7 @@ app.use(globalError);
 // ==========================================
 
 dbConnection();
-
+connectRedis();
 app.listen(PORT, () => {
     console.log(
         `Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`,

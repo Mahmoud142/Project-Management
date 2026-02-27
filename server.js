@@ -15,6 +15,7 @@ import dbConnection from "./config/database.js";
 import ApiError from "./utils/apiError.js";
 import globalError from "./middlewares/errorMiddleware.js";
 import {connectRedis} from "./config/redisClient.js";
+import "./queues/emailQueue.js";
 
 // Routes Imports (Must be at the top)
 import authRoute from "./routes/authRoute.js";

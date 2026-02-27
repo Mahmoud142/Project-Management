@@ -43,7 +43,21 @@ export const createTask = asyncHandler(async (req, res, next) => {
         description: req.body.description,
         dueDate: req.body.dueDate,
     });
-
+    await emailQueue.add(
+        "send-assignment-email",
+        {
+            taskId: task._id,
+            taskTitle: task.title,
+            assignedTo: task.employee, // The user ID
+            managerId: req.user._id, // Assuming you have req.user from auth middleware
+        },
+        {
+            // Advanced BullMQ options
+            attempts: 3, // Retry 3 times if it fails
+            backoff: 5000, // Wait 5 seconds between retries
+            removeOnComplete: true, // Keep Redis clean
+        },
+    );
     res.status(201).json({
         status: "success",
         message: "Task created successfully",

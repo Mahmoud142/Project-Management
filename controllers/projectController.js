@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler";
 import ApiError from "../utils/apiError.js";
 import Project from "../models/projectModel.js";
 import Task from "../models/taskModel.js";
-
+import { clearKey } from "../utils/clearCache.js";
 // @desc      Create a project
 // @route     POST /api/v1/projects
 // @access    Private (manager only)
@@ -14,6 +14,10 @@ export const createProject = asyncHandler(async (req, res, next) => {
         title: req.body.title,
         description: req.body.description,
     });
+
+    // Clear the cache for the stats and the main list
+    await clearKey("/api/v1/projects/stats");
+    await clearKey("/api/v1/projects");
 
     res.status(201).json({
         status: "success",
@@ -95,6 +99,11 @@ export const updateProjectById = asyncHandler(async (req, res, next) => {
     if (!project) {
         return next(new ApiError("Project not found", 404));
     }
+    
+    // Clear the cache for the stats and the main list
+    await clearKey("/api/v1/projects/stats");
+    await clearKey("/api/v1/projects");
+
     res.status(200).json({
         status: "success",
         message: "Project updated successfully",
@@ -115,6 +124,10 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
     if (!project) {
         return next(new ApiError("Project not found", 404));
     }
+    // Clear the cache for the stats and the main list
+    await clearKey("/api/v1/projects/stats");
+    await clearKey("/api/v1/projects");
+
     res.status(204).json({
         status: "success",
         message: "Project deleted successfully",

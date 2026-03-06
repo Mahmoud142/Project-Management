@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # 1. السيرفر الأساسي بتاعنا (الـ API)
+  api-server:
+    build: .
+    container_name: my-pm-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - config.env # عشان ياخد لينك الداتا بيز والتوكن سيكريت من هنا
+    restart: unless-stopped # لو السيرفر رستر أو فصل، الدوكر هيقومه لوحده
+
+  # 💡 (تريكة سينيورز): لو عندك ملف worker.js منفصل بيبعت الإيميلات، 
+  # نقدر نشغله ككونتينر تاني من نفس الـ Image من غير ما نكتب Dockerfile جديد!
+  # email-worker:
+  #   build: .
+  #   container_name: my-pm-worker
+  #   command: npm run worker # أو node worker.js
+  #   env_file:
+  #     - config.env
+  #   restart: unless-stopped

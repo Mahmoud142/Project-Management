@@ -1,22 +1,23 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # 1. السيرفر الأساسي بتاعنا (الـ API)
-  api-server:
-    build: .
-    container_name: my-pm-api
-    ports:
-      - "3000:3000"
-    env_file:
-      - config.env # عشان ياخد لينك الداتا بيز والتوكن سيكريت من هنا
-    restart: unless-stopped # لو السيرفر رستر أو فصل، الدوكر هيقومه لوحده
+    # 1. Our main API server
+    api-server:
+        build: .
+        container_name: my-pm-api
+        ports:
+            - "3000:3000"
+        env_file:
+            - config.env # Load database link and token secret from config file
+        restart: unless-stopped # Docker will auto-restart the container if it stops
 
-  # 💡 (تريكة سينيورز): لو عندك ملف worker.js منفصل بيبعت الإيميلات، 
-  # نقدر نشغله ككونتينر تاني من نفس الـ Image من غير ما نكتب Dockerfile جديد!
-  # email-worker:
-  #   build: .
-  #   container_name: my-pm-worker
-  #   command: npm run worker # أو node worker.js
-  #   env_file:
-  #     - config.env
-  #   restart: unless-stopped
+
+    # 💡 (Pro tip): If you have a separate worker.js file for sending emails,
+    # you can run it as another container from the same image without writing a new Dockerfile!
+    # email-worker:
+    #   build: .
+    #   container_name: my-pm-worker
+    #   command: npm run worker # or: node worker.js
+    #   env_file:
+    #     - config.env
+    #   restart: unless-stopped

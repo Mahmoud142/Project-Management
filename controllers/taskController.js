@@ -58,6 +58,16 @@ export const createTask = asyncHandler(async (req, res, next) => {
             removeOnComplete: true, // Keep Redis clean
         },
     );
+    console.log(
+        `[Emit] Sending notification to room: [${employee._id.toString()}]`,
+    );
+    
+    req.io.to(employee._id.toString()).emit("new-task-notification", {
+        title:  "new task assigned to you",
+        message: `the manager has assigned you a new task: ${task.title}`,
+        task: task,
+    });
+
     res.status(201).json({
         status: "success",
         message: "Task created successfully",

@@ -1,23 +1,17 @@
 version: "3.8"
 
 services:
-    # 1. Our main API server
-    api-server:
-        build: .
-        container_name: my-pm-api
-        ports:
-            - "3000:3000"
-        env_file:
-            - config.env # Load database link and token secret from config file
-        restart: unless-stopped # Docker will auto-restart the container if it stops
+  api-server:
+    build: .
+    env_file:
+      - config.env
+    restart: unless-stopped
 
-
-    # 💡 (Pro tip): If you have a separate worker.js file for sending emails,
-    # you can run it as another container from the same image without writing a new Dockerfile!
-    # email-worker:
-    #   build: .
-    #   container_name: my-pm-worker
-    #   command: npm run worker # or: node worker.js
-    #   env_file:
-    #     - config.env
-    #   restart: unless-stopped
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api-server

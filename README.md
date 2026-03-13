@@ -107,6 +107,7 @@ Project-Management/
 ├── config.env                 # Environment variables
 ├── docker-compose.yml         # Docker Compose configuration
 ├── Dockerfile                 # Docker image configuration
+├── nginx.conf                 # Nginx reverse proxy & SSL configuration
 ├── package.json
 └── server.js                  # Application entry point
 ```
@@ -176,8 +177,10 @@ docker-compose up -d
 This will:
 
 - Build the Docker image
-- Start the API server on port 3000
-- Auto-restart on failure
+- Start the API server (internal port 3000)
+- Start a Redis instance on port 6379
+- Start Nginx on ports 80 (HTTP → HTTPS redirect) and 443 (HTTPS), proxying requests to the API server
+- Auto-restart all services on failure
 
 2. **Stop the containers**
 

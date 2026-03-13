@@ -4,9 +4,9 @@ dotenv.config({ path: "config.env" });
 import { Queue, Worker } from "bullmq";
 import IORedis from "ioredis";
 
+// THE FIX: Removed the 'tls' block so it connects to the local Docker Redis
 const redisConnection = new IORedis(process.env.REDIS_URL, {
     maxRetriesPerRequest: null,
-    tls: { rejectUnauthorized: false },
 });
 
 redisConnection.on("error", (err) => {
